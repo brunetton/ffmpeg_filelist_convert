@@ -16,7 +16,8 @@ out_dir = Path(args[2])
 with file_list.open() as f:
     for line in f.readlines():
         line = line.rstrip()
-        print(f"--> {line}")
+        if line == '':
+            continue
         file = Path(line)                                                           # /media/bruno/BU2/FAE_20231026_002/NINJAV_S001_S001_T002.MOV
         out_file = Path(*file.parts[-2:])                                           # FAE_20231026_002/NINJAV_S001_S001_T002.MOV
         out_file = Path(out_dir / out_file.parent / Path(out_file.stem + '.mp4'))   # out/DD2/FAE_20231026_002/NINJAV_S001_S001_T002.mp4
