@@ -24,6 +24,7 @@ args = docopt(__doc__.format(self_filename=Path(__file__).name))
 
 out_dir = Path(args['OUT_DIR'])
 list_file = Path(args['LIST_FILE'])
+TMP_DIR = 'tmp/'
 
 ffmpeg_options = '-c:v libx264 -pix_fmt yuv420p -crf 20 -map v:0 -map a:0 -c:a aac -map_channel 0.0.2 -b:a 128k -vf "scale=960:540"'
 if args['--options']:
@@ -33,6 +34,9 @@ assert args['--on_exists'] in ['skip', 'overwrite']
 skip_or_overwrite = args['--on_exists']
 ffmpeg_command = args['--ffmpeg_command']
 
+# Create tmp dir
+Path.mkdir(TMP_DIR, exist_ok=True)
+# Convert
 with list_file.open() as f:
     file_number = 0
     for line in f.readlines():
@@ -44,7 +48,7 @@ with list_file.open() as f:
         nb_path_elements = int(args['--keep_path_elements'])
         out_file = Path(*file.parts[-nb_path_elements:])                            # DD1/FAE_20231026_002/NINJAV_S001_S001_T002.MOV (si 3 elements)
         out_file = Path(out_dir / out_file.parent / Path(out_file.stem + '.mp4'))   # /path/to/output/DD1/FAE_20231026_002/NINJAV_S001_S001_T002.mp4
-        tmp_file = f"tmp/{out_file.name}"                                           # tmp/NINJAV_S001_S001_T002.mp4
+        tmp_file = f"{TMP_DIR}/{out_file.name}"                                           # tmp/NINJAV_S001_S001_T002.mp4
         print(f"[{file_number}] {line}  ->  {out_file}")
         # If output file already exists
         if out_file.exists():
