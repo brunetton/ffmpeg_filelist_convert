@@ -8,6 +8,7 @@ Options:
     --simulate                      Do not actually convert files, only print commands that would be executed
     --keep_path_elements=<n>        [default: 2]
     --on_exists=<action>            (skip|overwrite) [default: skip]
+    --ffmpeg_command=<command>      ffmpeg binary name [default: ffmpeg]
 """
 
 from docopt import docopt
@@ -30,6 +31,7 @@ if args['--options']:
     print(f"Using ffmpeg options: {ffmpeg_options}")
 assert args['--on_exists'] in ['skip', 'overwrite']
 skip_or_overwrite = args['--on_exists']
+ffmpeg_command = args['--ffmpeg_command']
 
 with list_file.open() as f:
     for line in f.readlines():
@@ -54,7 +56,7 @@ with list_file.open() as f:
         os.system(f"rm -rf tmp/*")
         duration = subprocess.check_output(f"ffprobe -i {file} -show_entries format=duration -v quiet -of csv=\"p=0\"", shell=True)
         print("Duration: {0:.1f}m".format(float(duration.decode('utf8')) / 60))
-        command = f"ffpb -i {line} {ffmpeg_options} {tmp_file}"
+        command = f"{ffmpeg_command} -i {line} {ffmpeg_options} {tmp_file}"
         print(command)
         # Convertion
         if not args['--simulate']:
