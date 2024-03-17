@@ -34,25 +34,28 @@ skip_or_overwrite = args['--on_exists']
 ffmpeg_command = args['--ffmpeg_command']
 
 with list_file.open() as f:
+    file_number = 0
     for line in f.readlines():
         line = line.rstrip()
         if line == '':
             continue
+        file_number += 1
         file = Path(line)                                                           # /media/bruno/BU2/FAE_20231026_002/NINJAV_S001_S001_T002.MOV
         nb_path_elements = int(args['--keep_path_elements'])
         out_file = Path(*file.parts[-nb_path_elements:])                            # DD1/FAE_20231026_002/NINJAV_S001_S001_T002.MOV (si 3 elements)
         out_file = Path(out_dir / out_file.parent / Path(out_file.stem + '.mp4'))   # /path/to/output/DD1/FAE_20231026_002/NINJAV_S001_S001_T002.mp4
-        print(f"{line}  ->  {out_file}")
+        tmp_file = f"tmp/{out_file.name}"                                           # tmp/NINJAV_S001_S001_T002.mp4
+        print(f"[{file_number}] {line}  ->  {out_file}")
         # If output file already exists
         if out_file.exists():
             print(f"==> {out_file} already exists, ", end='')
             if skip_or_overwrite == 'skip':
                 print('ignore this file and continue conversion')
+                print("\n")
                 continue
             elif skip_or_overwrite == 'overwrite':
                 out_file.unlink()
                 print('replacing dersination')
-        tmp_file = f"tmp/{out_file.name}"                                           # tmp/NINJAV_S001_S001_T002.mp4
         os.system(f"rm -rf tmp/*")
         duration = subprocess.check_output(f"ffprobe -i {file} -show_entries format=duration -v quiet -of csv=\"p=0\"", shell=True)
         print("Duration: {0:.1f}m".format(float(duration.decode('utf8')) / 60))
