@@ -11,16 +11,41 @@ Simple & (not so) dirty ffmpeg conversion script
 
 ### List file
 ```
-/media/bruno/Elements/DD1/FAE_20231025_001/NINJAV_S001_S001_T017.MOV
-/media/bruno/Elements/DD1/FAE_20231025_001/NINJAV_S001_S001_T033.MOV
-/media/bruno/Elements/DD1/FAE_20231026_002/NINJAV_S001_S001_T003.MOV
-/media/bruno/Elements/DD1/FAE_20231026_002/NINJAV_S001_S001_T021.MOV
+./source_files/DD1/FAE_20231025_001/NINJAV_S001_S001_T017.MOV
+./source_files/DD1/FAE_20231025_001/NINJAV_S001_S001_T033.MOV
+./source_files/DD1/FAE_20231026_002/NINJAV_S001_S001_T003.MOV
+./source_files/DD1/FAE_20231026_002/NINJAV_S001_S001_T021.MOV
 ```
 
 ### Command
 ```bash
-./bash_convert.py list_file.txt outdir/  --keep_path_elements=3
+./bash_convert.py list_file.txt outdir/  --keep_path_elements=2
 ```
 
 ### Output
-TODO
+```
+outdir
+├── FAE_20231025_001
+│   ├── NINJAV_S001_S001_T017.mp4
+│   └── NINJAV_S001_S001_T033.mp4
+└── FAE_20231026_002
+    ├── NINJAV_S001_S001_T003.mp4
+    └── NINJAV_S001_S001_T021.mp4
+```
+
+### Same example but using --keep_path_elements=3
+
+```bash
+./bash_convert.py list_file.txt outdir/  --keep_path_elements=2
+```
+
+```
+outdir
+└── DD1
+    ├── FAE_20231025_001
+    │   ├── NINJAV_S001_S001_T017.mp4
+    │   └── NINJAV_S001_S001_T033.mp4
+    └── FAE_20231026_002
+        ├── NINJAV_S001_S001_T003.mp4
+        └── NINJAV_S001_S001_T021.mp4
+```

@@ -35,7 +35,7 @@ skip_or_overwrite = args['--on_exists']
 ffmpeg_command = args['--ffmpeg_command']
 
 # Create tmp dir
-Path.mkdir(TMP_DIR, exist_ok=True)
+Path(TMP_DIR).mkdir(exist_ok=True)
 # Convert
 with list_file.open() as f:
     file_number = 0
