@@ -1,4 +1,4 @@
-#!/bin/python3
+#!/usr/bin/env python3
 
 """
 Usage:
@@ -7,7 +7,7 @@ Usage:
 Options:
     --simulate                      Do not actually convert files, only print commands that would be executed
     --keep_path_elements=<n>        [default: 2]
-
+    --on_exists=<action>            (skip|overwrite) [default: skip]
 """
 
 from docopt import docopt
@@ -19,6 +19,7 @@ import sys
 from pathlib import Path
 
 args = docopt(__doc__.format(self_filename=Path(__file__).name))
+# print(args)
 
 out_dir = Path(args['OUT_DIR'])
 list_file = Path(args['LIST_FILE'])
@@ -27,6 +28,8 @@ ffmpeg_options = '-c:v libx264 -pix_fmt yuv420p -crf 20 -map v:0 -map a:0 -c:a a
 if args['--options']:
     ffmpeg_options = args['--options']
     print(f"Using ffmpeg options: {ffmpeg_options}")
+assert args['--on_exists'] in ['skip', 'overwrite']
+skip_or_overwrite = args['--on_exists']
 
 with list_file.open() as f:
     for line in f.readlines():
@@ -38,6 +41,15 @@ with list_file.open() as f:
         out_file = Path(*file.parts[-nb_path_elements:])                            # DD1/FAE_20231026_002/NINJAV_S001_S001_T002.MOV (si 3 elements)
         out_file = Path(out_dir / out_file.parent / Path(out_file.stem + '.mp4'))   # /path/to/output/DD1/FAE_20231026_002/NINJAV_S001_S001_T002.mp4
         print(f"{line}  ->  {out_file}")
+        # If output file already exists
+        if out_file.exists():
+            print(f"==> {out_file} already exists, ", end='')
+            if skip_or_overwrite == 'skip':
+                print('ignore this file and continue conversion')
+                continue
+            elif skip_or_overwrite == 'overwrite':
+                out_file.unlink()
+                print('replacing dersination')
         tmp_file = f"tmp/{out_file.name}"                                           # tmp/NINJAV_S001_S001_T002.mp4
         os.system(f"rm -rf tmp/*")
         duration = subprocess.check_output(f"ffprobe -i {file} -show_entries format=duration -v quiet -of csv=\"p=0\"", shell=True)
