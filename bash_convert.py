@@ -60,9 +60,11 @@ with list_file.open() as f:
                 print("\n")
                 continue
             elif skip_or_overwrite == 'overwrite':
-                out_file.unlink()
+                if not args['--simulate']:
+                    out_file.unlink()
                 print('replacing dersination')
-        os.system(f"rm -rf tmp/*")
+        if not args['--simulate']:
+            os.system(f"rm -rf tmp/*")
         duration = subprocess.check_output(f"ffprobe -i {file} -show_entries format=duration -v quiet -of csv=\"p=0\"", shell=True)
         print("Duration: {0:.1f}m".format(float(duration.decode('utf8')) / 60))
         command = f"{ffmpeg_command} -i {line} {ffmpeg_options} {tmp_file}"
