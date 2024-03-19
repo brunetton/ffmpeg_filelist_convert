@@ -38,6 +38,8 @@ ffmpeg_command = args['--ffmpeg_command']
 Path(TMP_DIR).mkdir(exist_ok=True)
 # Convert
 with list_file.open() as f:
+    # count number of non-empty lines in list_file
+    total = subprocess.check_output(f"sed -n '/./p' {list_file} | wc -l", shell=True).decode('utf8').strip()
     file_number = 0
     for line in f.readlines():
         line = line.rstrip()
@@ -48,8 +50,8 @@ with list_file.open() as f:
         nb_path_elements = int(args['--keep_path_elements'])
         out_file = Path(*file.parts[-nb_path_elements:])                            # DD1/FAE_20231026_002/NINJAV_S001_S001_T002.MOV (si 3 elements)
         out_file = Path(out_dir / out_file.parent / Path(out_file.stem + '.mp4'))   # /path/to/output/DD1/FAE_20231026_002/NINJAV_S001_S001_T002.mp4
-        tmp_file = f"{TMP_DIR}/{out_file.name}"                                           # tmp/NINJAV_S001_S001_T002.mp4
-        print(f"[{file_number}] {line}  ->  {out_file}")
+        tmp_file = f"{TMP_DIR}/{out_file.name}"                                     # tmp/NINJAV_S001_S001_T002.mp4
+        print(f"[{file_number}/{total}] {line}  ->  {out_file}")
         # If output file already exists
         if out_file.exists():
             print(f"==> {out_file} already exists, ", end='')
