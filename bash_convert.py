@@ -6,8 +6,9 @@ Usage:
 
 Options:
     --simulate                      Do not actually convert files, only print commands that would be executed
-    --keep_path_elements=<n>        [default: 2]
+    --keep_path_elements=<n>        [default: 2] nb dirs to keep on output path
     --on_exists=<action>            (skip|overwrite) [default: skip]
+    --on_source_not_found=<action>  (continue|stop) [default: stop]
     --ffmpeg_command=<command>      ffmpeg binary name [default: ffmpeg]
 """
 
@@ -32,6 +33,8 @@ if args['--options']:
     print(f"Using ffmpeg options: {ffmpeg_options}")
 assert args['--on_exists'] in ['skip', 'overwrite']
 skip_or_overwrite = args['--on_exists']
+assert args['--on_source_not_found'] in ['continue', 'stop']
+on_source_not_found = args['--on_source_not_found']
 ffmpeg_command = args['--ffmpeg_command']
 
 # Create tmp dir
@@ -52,6 +55,11 @@ with list_file.open() as f:
         out_file = Path(out_dir / out_file.parent / Path(out_file.stem + '.mp4'))   # /path/to/output/DD1/FAE_20231026_002/NINJAV_S001_S001_T002.mp4
         tmp_file = f"{TMP_DIR}/{out_file.name}"                                     # tmp/NINJAV_S001_S001_T002.mp4
         print(f"[{file_number}/{total}] {line}  ->  {out_file}")
+        # Check if source file exists
+        if not file.exists():
+            print(f"ERROR {file} doesn't exists")
+            if on_source_not_found == 'stop':
+                sys.exit(-1)
         # If output file already exists
         if out_file.exists():
             print(f"==> {out_file} already exists, ", end='')
