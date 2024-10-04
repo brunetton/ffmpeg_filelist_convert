@@ -6,10 +6,11 @@ Usage:
 
 Options:
     --simulate                      Do not actually convert files, only print commands that would be executed
+    --ffmpeg_command=<command>      ffmpeg binary name [default: ffmpeg]
     --keep_path_elements=<n>        [default: 2] nb dirs to keep on output path
     --on_exists=<action>            (skip|overwrite) [default: skip]
     --on_source_not_found=<action>  (continue|stop) [default: stop]
-    --ffmpeg_command=<command>      ffmpeg binary name [default: ffmpeg]
+    --only-print-new-names          Only print destination name (no conversion is done)
 """
 
 from docopt import docopt
@@ -54,12 +55,15 @@ with list_file.open() as f:
         out_file = Path(*file.parts[-nb_path_elements:])                            # DD1/FAE_20231026_002/NINJAV_S001_S001_T002.MOV (si 3 elements)
         out_file = Path(out_dir / out_file.parent / Path(out_file.stem + '.mp4'))   # /path/to/output/DD1/FAE_20231026_002/NINJAV_S001_S001_T002.mp4
         tmp_file = f"{TMP_DIR}/{out_file.name}"                                     # tmp/NINJAV_S001_S001_T002.mp4
-        print(f"[{file_number}/{total}] {line}  ->  {out_file}")
         # Check if source file exists
         if not file.exists():
             print(f"ERROR {file} doesn't exists")
             if on_source_not_found == 'stop':
                 sys.exit(-1)
+        if args['--only-print-new-names']:
+            print(out_file)
+            continue
+        print(f"[{file_number}/{total}] {line}  ->  {out_file}")
         # If output file already exists
         if out_file.exists():
             print(f"==> {out_file} already exists, ", end='')
